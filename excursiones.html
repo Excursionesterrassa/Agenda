@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excursiones Grupo Senderismo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #f5f7fa;
+            padding: 15px;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .admin-panel {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            margin: 20px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .admin-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #357abd;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .excursion-card {
+            margin: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .excursion-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
+
+        .excursion-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .excursion-date {
+            font-size: 1.1em;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .excursion-details {
+            font-size: 0.95em;
+            opacity: 0.8;
+        }
+
+        .participant-count {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .participants-section {
+            padding: 20px;
+        }
+
+        .participants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .participant-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .participant-item:hover {
+            background: #e3f2fd;
+            border-color: #4a90e2;
+            transform: translateY(-1px);
+        }
+
+        .participant-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .participant-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .participant-notes {
+            font-size: 0.85em;
+            color: #666;
+            font-style: italic;
+        }
+
+        .participant-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 0.8em;
+            border-radius: 4px;
+        }
+
+        .add-participant-section {
+            background: #f0f8ff;
+            padding: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .add-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .form-control {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9em;
+            min-width: 120px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #4a90e2;
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+
+        .stats-bar {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+
+        .stat-number {
+            font-weight: 700;
+            color: #4a90e2;
+            font-size: 1.1em;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .close {
+            float: right;
+            font-size: 24px;
+            cursor: pointer;
+            color: #aaa;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        @media (max-width: 768px) {
+            .participants-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .add-form {
+                flex-direction: column;
+            }
+            
+            .form-control {
+                min-width: 100%;
+            }
+            
+            .stats-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .admin-controls {
+                justify-content: center;
+            }
+        }
+
+        .highlight {
+            animation: highlight 2s ease-in-out;
+        }
+
+        @keyframes highlight {
+            0% { background: #fff3cd; }
+            100% { background: inherit; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏔️ Excursiones Grupo Senderismo</h1>
+            <p>Sistema de Inscripciones • Temporada 2024/2025</p>
+        </div>
+
+        <div class="admin-panel">
+            <h3>🛠️ Panel de Administración</h3>
+            <p><strong>Solo para organizadores:</strong> Usa estos controles para gestionar las excursiones</p>
+            <div class="admin-controls">
+                <button class="btn btn-primary" onclick="addNewExcursion()">➕ Nueva Excursión</button>
+                <button class="btn btn-success" onclick="exportData()">📊 Exportar Datos</button>
+                <button class="btn btn-primary" onclick="showStatistics()">📈 Estadísticas</button>
+            </div>
+        </div>
+
+        <div id="excursions-container">
+            <!-- Can Candi -->
+            <div class="excursion-card" data-excursion="can-candi">
+                <div class="excursion-header">
+                    <div class="participant-count">5 inscritos</div>
+                    <div class="excursion-title">🏔️ Can Candi i les Foradades</div>
+                    <div class="excursion-date">📅 Miércoles 24 de Septiembre • 9:00h</div>
+                    <div class="excursion-details">
+                        📍 Gasolinera Q8 • 📏 10km, 450m desnivel • ⏱️ 3h aprox
+                    </div>
+                </div>
+                <div class="participants-section">
+                    <div class="participants-grid">
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Sheila</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">David</span>
+                                <span class="participant-notes">🐶 Con perro</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Miki</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Gemma</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Ramón</span>
+                                <span class="participant-notes">🐶 +Gora</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="add-participant-section">
+                        <div class="add-form">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" class="form-control participant-name-input" placeholder="Tu nombre">
+                            </div>
+                            <div class="form-group">
+                                <label>Notas (opcional)</label>
+                                <input type="text" class="form-control participant-notes-input" placeholder="ej: con perro, ruta corta...">
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-success" onclick="addParticipant(this)">➕ Apuntarme</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <span>👥 Inscritos:</span>
+                        <span class="stat-number">5</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>🐶 Con mascota:</span>
+                        <span class="stat-number">2</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📅 Faltan:</span>
+                        <span class="stat-number">2 días</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Caminada Nocturna -->
+            <div class="excursion-card" data-excursion="nocturna">
+                <div class="excursion-header">
+                    <div class="participant-count">5 inscritos</div>
+                    <div class="excursion-title">🌙 Caminada Nocturna contra el càncer</div>
+                    <div class="excursion-date">📅 Sábado 27 de Septiembre • 19:30h</div>
+                    <div class="excursion-details">
+                        📍 Premià de Dalt - Pl. de la Fàbrica • 📏 3km (+150m) / 7km (+375m)
+                    </div>
+                </div>
+                <div class="participants-section">
+                    <div class="participants-grid">
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Sandra</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">David</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Miki</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Jessica</span>
+                                <span class="participant-notes">🐶 Con perro</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Pepe</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="add-participant-section">
+                        <div class="add-form">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" class="form-control participant-name-input" placeholder="Tu nombre">
+                            </div>
+                            <div class="form-group">
+                                <label>Notas (opcional)</label>
+                                <input type="text" class="form-control participant-notes-input" placeholder="ej: con perro, ruta corta...">
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-success" onclick="addParticipant(this)">➕ Apuntarme</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <span>👥 Inscritos:</span>
+                        <span class="stat-number">5</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>🐶 Con mascota:</span>
+                        <span class="stat-number">1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📅 Faltan:</span>
+                        <span class="stat-number">5 días</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Foradada Montserrat -->
+            <div class="excursion-card" data-excursion="foradada">
+                <div class="excursion-header">
+                    <div class="participant-count">11 inscritos</div>
+                    <div class="excursion-title">⛰️ Foradada - Forat del vent Montserrat</div>
+                    <div class="excursion-date">📅 Domingo 12 de Octubre • 9:00h</div>
+                    <div class="excursion-details">
+                        📍 Por decidir • 📏 10km, 550m desnivel • ⏱️ 4-5h
+                    </div>
+                </div>
+                <div class="participants-section">
+                    <div class="participants-grid">
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">David</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Sandra</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Pepe</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Jessica</span>
+                                <span class="participant-notes">🐶 Con perro</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Josep</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Fátima</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Efrén</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Xavi</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Isa</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Miki</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                        <div class="participant-item">
+                            <div class="participant-info">
+                                <span class="participant-name">Sheila</span>
+                            </div>
+                            <div class="participant-actions">
+                                <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="add-participant-section">
+                        <div class="add-form">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" class="form-control participant-name-input" placeholder="Tu nombre">
+                            </div>
+                            <div class="form-group">
+                                <label>Notas (opcional)</label>
+                                <input type="text" class="form-control participant-notes-input" placeholder="ej: con perro, ruta corta...">
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-success" onclick="addParticipant(this)">➕ Apuntarme</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <span>👥 Inscritos:</span>
+                        <span class="stat-number">11</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>🐶 Con mascota:</span>
+                        <span class="stat-number">1</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📅 Faltan:</span>
+                        <span class="stat-number">20 días</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para nueva excursión -->
+    <div id="newExcursionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <h2 class="modal-title">➕ Nueva Excursión</h2>
+            </div>
+            <div class="add-form">
+                <div class="form-group">
+                    <label>Nombre de la Excursión</label>
+                    <input type="text" class="form-control" id="newExcursionName" placeholder="ej: Montserrat por Sant Jeroni">
+                </div>
+                <div class="form-group">
+                    <label>Fecha y Hora</label>
+                    <input type="text" class="form-control" id="newExcursionDate" placeholder="ej: Sábado 15 de Octubre • 9:00h">
+                </div>
+                <div class="form-group">
+                    <label>Detalles</label>
+                    <input type="text" class="form-control" id="newExcursionDetails" placeholder="📍 Punto encuentro • 📏 distancia, desnivel • ⏱️ duración">
+                </div>
+                <div class="form-group" style="margin-top: 20px;">
+                    <button class="btn btn-success" onclick="createExcursion()">Crear Excursión</button>
+                    <button class="btn" onclick="closeModal()" style="background: #ccc; margin-left: 10px;">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function addParticipant(button) {
+            const section = button.closest('.add-participant-section');
+            const nameInput = section.querySelector('.participant-name-input');
+            const notesInput = section.querySelector('.participant-notes-input');
+            
+            const name = nameInput.value.trim();
+            if (!name) {
+                alert('Por favor, introduce tu nombre');
+                return;
+            }
+            
+            const notes = notesInput.value.trim();
+            const participantsGrid = section.parentElement.querySelector('.participants-grid');
+            
+            // Crear nuevo participante
+            const participantItem = document.createElement('div');
+            participantItem.className = 'participant-item highlight';
+            participantItem.innerHTML = `
+                <div class="participant-info">
+                    <span class="participant-name">${name}</span>
+                    ${notes ? `<span class="participant-notes">${notes}</span>` : ''}
+                </div>
+                <div class="participant-actions">
+                    <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+                </div>
+            `;
+            
+            participantsGrid.appendChild(participantItem);
+            
+            // Limpiar campos
+            nameInput.value = '';
+            notesInput.value = '';
+            
+            // Actualizar contadores
+            updateStats(button.closest('.excursion-card'));
+            
+            // Scroll al nuevo participante
+            participantItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function removeParticipant(button) {
+            if (confirm('¿Seguro que quieres eliminar este participante?')) {
+                const participantItem = button.closest('.participant-item');
+                const excursionCard = button.closest('.excursion-card');
+                
+                participantItem.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => {
+                    participantItem.remove();
+                    updateStats(excursionCard);
+                }, 300);
+            }
+        }
+
+        function updateStats(excursionCard) {
+            const participants = excursionCard.querySelectorAll('.participant-item').length;
+            const withPets = excursionCard.querySelectorAll('.participant-notes').length;
+            
+            // Actualizar contador en header
+            const countElement = excursionCard.querySelector('.participant-count');
+            countElement.textContent = `${participants} inscrito${participants !== 1 ? 's' : ''}`;
+            
+            // Actualizar stats bar
+            const statsBar = excursionCard.querySelector('.stats-bar');
+            const participantsStat = statsBar.querySelector('.stat-number');
+            const petsStat = statsBar.querySelectorAll('.stat-number')[1];
+            
+            participantsStat.textContent = participants;
+            petsStat.textContent = withPets;
+        }
+
+        function addNewExcursion() {
+            document.getElementById('newExcursionModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('newExcursionModal').style.display = 'none';
+        }
+
+        function createExcursion() {
+            const name = document.getElementById('newExcursionName').value.trim();
+            const date = document.getElementById('newExcursionDate').value.trim();
+            const details = document.getElementById('newExcursionDetails').value.trim();
+            
+            if (!name || !date) {
+                alert('Por favor, completa al menos el nombre y la fecha');
+                return;
+            }
+            
+            const excursionsContainer = document.getElementById('excursions-container');
+            const newExcursion = document.createElement('div');
+            newExcursion.className = 'excursion-card highlight';
+            newExcursion.innerHTML = `
+                <div class="excursion-header">
+                    <div class="participant-count">0 inscritos</div>
+                    <div class="excursion-title">🏔️ ${name}</div>
+                    <div class="excursion-date">📅 ${date}</div>
+                    <div class="excursion-details">
+                        ${details || 'Detalles por confirmar'}
+                    </div>
+                </div>
+                <div class="participants-section">
+                    <div class="participants-grid">
+                        <!-- Participantes se añadirán aquí -->
+                    </div>
+                    <div class="add-participant-section">
+                        <div class="add-form">
+                            <div class="form-group">
+                                <label>Nombre</label>
+                                <input type="text" class="form-control participant-name-input" placeholder="Tu nombre">
+                            </div>
+                            <div class="form-group">
+                                <label>Notas (opcional)</label>
+                                <input type="text" class="form-control participant-notes-input" placeholder="ej: con perro, ruta corta...">
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-success" onclick="addParticipant(this)">➕ Apuntarme</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <span>👥 Inscritos:</span>
+                        <span class="stat-number">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>🐶 Con mascota:</span>
+                        <span class="stat-number">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>📅 Estado:</span>
+                        <span class="stat-number">Nueva</span>
+                    </div>
+                </div>
+            `;
+            
+            excursionsContainer.appendChild(newExcursion);
+            
+            // Limpiar modal
+            document.getElementById('newExcursionName').value = '';
+            document.getElementById('newExcursionDate').value = '';
+            document.getElementById('newExcursionDetails').value = '';
+            
+            closeModal();
+            
+            // Scroll a la nueva excursión
+            newExcursion.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function exportData() {
+            let csvContent = "Excursión,Fecha,Participante,Notas\n";
+            
+            document.querySelectorAll('.excursion-card').forEach(card => {
+                const title = card.querySelector('.excursion-title').textContent.replace(/🏔️|⛰️|🌙/g, '').trim();
+                const date = card.querySelector('.excursion-date').textContent.replace('📅 ', '');
+                
+                const participants = card.querySelectorAll('.participant-item');
+                if (participants.length === 0) {
+                    csvContent += `"${title}","${date}","Sin participantes",""\n`;
+                } else {
+                    participants.forEach(participant => {
+                        const name = participant.querySelector('.participant-name').textContent;
+                        const notes = participant.querySelector('.participant-notes')?.textContent || '';
+                        csvContent += `"${title}","${date}","${name}","${notes}"\n`;
+                    });
+                }
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `excursiones_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+            
+            alert('📊 Datos exportados correctamente. Ahora puedes importar el CSV en Google Sheets o Excel.');
+        }
+
+        function showStatistics() {
+            let totalParticipants = 0;
+            let totalWithPets = 0;
+            let totalExcursions = 0;
+            let participantCount = {};
+            
+            document.querySelectorAll('.excursion-card').forEach(card => {
+                totalExcursions++;
+                const participants = card.querySelectorAll('.participant-item');
+                totalParticipants += participants.length;
+                
+                participants.forEach(participant => {
+                    const name = participant.querySelector('.participant-name').textContent;
+                    participantCount[name] = (participantCount[name] || 0) + 1;
+                    
+                    if (participant.querySelector('.participant-notes')?.textContent.includes('🐶')) {
+                        totalWithPets++;
+                    }
+                });
+            });
+            
+            const topParticipants = Object.entries(participantCount)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 5);
+            
+            let statsMessage = `📊 ESTADÍSTICAS DEL GRUPO\n\n`;
+            statsMessage += `🏔️ Total excursiones: ${totalExcursions}\n`;
+            statsMessage += `👥 Total inscripciones: ${totalParticipants}\n`;
+            statsMessage += `🐶 Inscripciones con mascota: ${totalWithPets}\n`;
+            statsMessage += `📈 Media por excursión: ${(totalParticipants/totalExcursions).toFixed(1)}\n\n`;
+            statsMessage += `🏆 TOP PARTICIPANTES:\n`;
+            topParticipants.forEach(([name, count], index) => {
+                statsMessage += `${index + 1}. ${name}: ${count} excursiones\n`;
+            });
+            
+            alert(statsMessage);
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('newExcursionModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Animación de fadeOut
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                0% { opacity: 1; transform: translateX(0); }
+                100% { opacity: 0; transform: translateX(-20px); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Auto-focus en campos de nombre
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('participant-name-input')) {
+                e.target.select();
+            }
+        });
+
+        // Enter para añadir participante
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.classList.contains('form-control')) {
+                const button = e.target.closest('.add-participant-section').querySelector('.btn-success');
+                button.click();
+            }
+        });
+
+        console.log('✅ Sistema de excursiones cargado correctamente');
+    </script>
+</body>
+</html>
