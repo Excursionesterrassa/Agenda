@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Sistema de Inscripciones</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f2f2f2; margin: 0; padding: 20px; }
+    h1 { text-align: center; }
+
+    .excursion-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 20px;
+      position: relative;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .excursion-title {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .excursion-date {
+      font-size: 14px;
+      color: #555;
+    }
+
+    .participants-grid {
+      margin-top: 10px;
+      display: grid;
+      gap: 5px;
+    }
+
+    .participant-item {
+      background: #eee;
+      padding: 5px 10px;
+      border-radius: 6px;
+    }
+
+    .participant-info {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .participant-actions button {
+      margin-left: 5px;
+      border: none;
+      padding: 3px 6px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn { background: #007bff; color: white; }
+    .btn-danger { background: red; color: white; }
+    .btn-small { font-size: 12px; padding: 2px 5px; }
+
+    .add-participant-section {
+      margin-top: 10px;
+      display: flex;
+      gap: 5px;
+    }
+
+    .add-participant-section input {
+      flex: 1;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .stats {
+      font-size: 13px;
+      margin-top: 5px;
+      color: #333;
+    }
+
+    .highlight {
+      animation: highlightAnim 2s ease-out;
+    }
+
+    @keyframes highlightAnim {
+      from { background: yellow; }
+      to { background: #eee; }
+    }
+  </style>
+</head>
+<body>
+  <h1>Sistema de Inscripciones</h1>
+
+  <div class="excursion-card">
+    <div class="excursion-title">Excursión de prueba</div>
+    <div class="excursion-date">Fecha: 30/09/2025</div>
+    <div class="participants-grid"></div>
+
+    <div class="add-participant-section">
+      <input type="text" class="participant-name-input" placeholder="Tu nombre">
+      <input type="text" class="participant-notes-input" placeholder="Notas (opcional)">
+      <button class="btn" onclick="addParticipant(this)">Apuntarme</button>
+    </div>
+    <div class="stats">Total apuntados: <span class="count">0</span></div>
+  </div>
+
+<script>
+  // 🔹 URL del Google Sheets Web App
+  const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbwabKBo_LrvEdRCP_kJ7G1K1ivcSQ-TAokpxVFhRk71Rzi0bxUhemnEmh605Y6V4GsDwQ/exec";
+
+  function addParticipant(button) {
+    const section = button.closest('.add-participant-section');
+    const nameInput = section.querySelector('.participant-name-input');
+    const notesInput = section.querySelector('.participant-notes-input');
+
+    const name = nameInput.value.trim();
+    if (!name) {
+      alert('Por favor, introduce tu nombre');
+      return;
+    }
+
+    const notes = notesInput.value.trim();
+    const excursionTitle = button.closest('.excursion-card').querySelector('.excursion-title').textContent;
+    const excursionDate = button.closest('.excursion-card').querySelector('.excursion-date').textContent;
+
+    // 🔹 Guardar en Google Sheets
+    fetch(GOOGLE_SHEETS_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        nombre: name,
+        notas: notes,
+        excursion: excursionTitle,
+        fecha: excursionDate
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log("✅ Guardado en Google Sheets:", data);
+      alert("¡Te has apuntado correctamente!");
+    })
+    .catch(err => {
+      console.error("❌ Error:", err);
+      alert("Hubo un problema al guardar tu inscripción");
+    });
+
+    // 🔹 Mostrar en pantalla
+    const participantsGrid = section.parentElement.querySelector('.participants-grid');
+    const participantItem = document.createElement('div');
+    participantItem.className = 'participant-item highlight';
+    participantItem.innerHTML = `
+      <div class="participant-info">
+        <span class="participant-name">${name}</span>
+        ${notes ? `<span class="participant-notes">${notes}</span>` : ''}
+      </div>
+      <div class="participant-actions">
+        <button class="btn btn-danger btn-small" onclick="removeParticipant(this)">✕</button>
+      </div>
+    `;
+    participantsGrid.appendChild(participantItem);
+
+    // Limpiar campos
+    nameInput.value = '';
+    notesInput.value = '';
+
+    // Actualizar contador
+    updateStats(button.closest('.excursion-card'));
+
+    // Scroll al nuevo participante
+    participantItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function removeParticipant(button) {
+    const item = button.closest('.participant-item');
+    const card = button.closest('.excursion-card');
+    item.remove();
+    updateStats(card);
+  }
+
+  function updateStats(card) {
+    const count = card.querySelectorAll('.participant-item').length;
+    card.querySelector('.count').textContent = count;
+  }
+</script>
+</body>
+</html>
